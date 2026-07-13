@@ -8,8 +8,9 @@ export default function Login() {
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    router.push('/dashboard');
-  };
+  // Swapping out .push for .replace drops the login screen from the history stack completely
+  router.replace('/dashboard');
+};
 
   return (
     <View style={styles.outer}>
