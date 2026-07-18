@@ -37,6 +37,9 @@ yarn-error.*
 chatLanguageModels.json
 proxy.js
 
+# local review artifacts
+local-artifacts/
+
 # typescript
 *.tsbuildinfo
 
