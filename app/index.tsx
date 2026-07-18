@@ -43,8 +43,6 @@ export default function LoginScreen() {
             autoCapitalize="none"
             value={email}
             onChangeText={setEmail}
-            // @ts-ignore
-            style={[styles.input, { outlineStyle: 'none' }]}
           />
 
           <Text style={styles.inputLabel}>Password</Text>
@@ -55,8 +53,6 @@ export default function LoginScreen() {
             secureTextEntry
             value={password}
             onChangeText={setPassword}
-            // @ts-ignore
-            style={[styles.input, { outlineStyle: 'none' }]}
           />
 
           <TouchableOpacity style={styles.forgotPassword}>

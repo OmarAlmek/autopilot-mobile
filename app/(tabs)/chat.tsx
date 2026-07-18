@@ -3,76 +3,76 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Mod
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
-interface TeamMember { id: string; name: string; role: string; time: string; preview: string; online: boolean; }
+import { useWorkspace } from '../../src/context/WorkspaceContext';
 
 export default function ChatHubScreen() {
   const router = useRouter();
+  const { chatThreads, can, canAccessThread, addTeamMember } = useWorkspace();
   const [modalVisible, setModalVisible] = useState(false);
   const [newMemberName, setNewMemberName] = useState('');
   const [newMemberRole, setNewMemberRole] = useState('');
-
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
-    { id: '1', name: 'Alex Rivera', role: 'Product Manager', time: '2h ago', preview: 'Did you review the updated design specs?', online: true },
-    { id: '2', name: 'Maya Lin', role: 'Lead Engineer', time: '3h ago', preview: 'The deployment passed staging.', online: false }
-  ]);
+  const accessibleThreads = chatThreads.filter((thread) => canAccessThread(thread.id));
+  const agents = accessibleThreads.filter((thread) => thread.kind === 'agent');
+  const teamMembers = accessibleThreads.filter((thread) => thread.kind === 'teammate');
+  const canManageTeam = can('manageTeam');
 
   const handleCreateMember = () => {
-    if (!newMemberName.trim() || !newMemberRole.trim()) return;
-    const newTeammate: TeamMember = {
-      id: Date.now().toString(), name: newMemberName.trim(), role: newMemberRole.trim(), time: 'Just now', preview: 'Chat thread started.', online: true,
-    };
-    setTeamMembers((prev) => [newTeammate, ...prev]);
+    const threadId = addTeamMember(newMemberName, newMemberRole);
+    if (!threadId) return;
     setNewMemberName(''); setNewMemberRole(''); setModalVisible(false);
+    openChat(threadId);
   };
 
-  // 🟢 Helper to open a chat and pass the name dynamically
-  const openChat = (name: string, isOnline: boolean) => {
-    router.push({ pathname: '/message', params: { title: name, online: isOnline ? 'true' : 'false' } });
+  const openChat = (threadId: string) => {
+    router.push({ pathname: '/message', params: { threadId } });
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Messages</Text>
-        <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
-          <MaterialCommunityIcons name="plus" size={24} color="#8B5CF6" />
+        <TouchableOpacity
+          style={[styles.addButton, !canManageTeam && styles.addButtonDisabled]}
+          onPress={() => setModalVisible(true)}
+          disabled={!canManageTeam}
+          activeOpacity={0.7}
+          accessibilityLabel={canManageTeam ? 'Add team member' : 'Only admins can add team members'}
+        >
+          <MaterialCommunityIcons name="account-plus-outline" size={22} color={canManageTeam ? '#8B5CF6' : '#94A3B8'} />
         </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.sectionTitle}>AI Agents</Text>
         
-        <TouchableOpacity style={styles.chatRow} activeOpacity={0.7} onPress={() => openChat('Sarah (Finance AI)', true)}>
-          <View style={[styles.avatar, { backgroundColor: '#EDE9FE' }]}><MaterialCommunityIcons name="robot-outline" size={24} color="#8B5CF6" /><View style={styles.onlineBadge} /></View>
-          <View style={styles.chatDetails}>
-            <View style={styles.chatHeader}><Text style={styles.chatName}>Sarah (Finance AI)</Text><Text style={styles.chatTime}>9:41 AM</Text></View>
-            <Text style={styles.chatPreview} numberOfLines={1}>I have reconciled the latest vendor in...</Text>
-          </View>
-        </TouchableOpacity> 
-
-        <View style={styles.divider} />
-
-        <TouchableOpacity style={styles.chatRow} activeOpacity={0.7} onPress={() => openChat('Ramsey (Ops AI)', true)}>
-          <View style={[styles.avatar, { backgroundColor: '#EDE9FE' }]}><MaterialCommunityIcons name="robot-outline" size={24} color="#8B5CF6" /><View style={styles.onlineBadge} /></View>
-          <View style={styles.chatDetails}>
-            <View style={styles.chatHeader}><Text style={styles.chatName}>Ramsey (Ops AI)</Text><Text style={styles.chatTime}>Yesterday</Text></View>
-            <Text style={styles.chatPreview} numberOfLines={1}>Your Q3 seasonality adjustments have been applied to the forecast.</Text>
-          </View>
-        </TouchableOpacity>
+        {agents.map((agent, index) => {
+          const latestMessage = agent.messages[agent.messages.length - 1];
+          return (
+            <View key={agent.id}>
+              <TouchableOpacity style={styles.chatRow} activeOpacity={0.7} onPress={() => openChat(agent.id)}>
+                <View style={[styles.avatar, { backgroundColor: '#EDE9FE' }]}><MaterialCommunityIcons name="robot-outline" size={24} color="#8B5CF6" />{agent.online && <View style={styles.onlineBadge} />}</View>
+                <View style={styles.chatDetails}>
+                  <View style={styles.chatHeader}><Text style={styles.chatName}>{agent.name} ({agent.role})</Text><Text style={styles.chatTime}>{latestMessage?.createdAt}</Text></View>
+                  <Text style={styles.chatPreview} numberOfLines={1}>{latestMessage?.text}</Text>
+                </View>
+              </TouchableOpacity>
+              {index < agents.length - 1 && <View style={styles.divider} />}
+            </View>
+          );
+        })}
 
         <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Company Team</Text>
 
         {teamMembers.map((member, index) => (
           <View key={member.id}>
-            {/* 🟢 Now every human teammate is fully clickable! */}
-            <TouchableOpacity style={styles.chatRow} activeOpacity={0.7} onPress={() => openChat(member.name, member.online)}>
+            <TouchableOpacity style={styles.chatRow} activeOpacity={0.7} onPress={() => openChat(member.id)}>
               <View style={[styles.avatar, { backgroundColor: '#F1F5F9' }]}><MaterialCommunityIcons name="account-outline" size={24} color="#64748B" />{member.online && <View style={styles.onlineBadge} />}</View>
               <View style={styles.chatDetails}>
                 <View style={styles.chatHeader}>
                   <View><Text style={styles.chatName}>{member.name}</Text><Text style={styles.roleSubtext}>{member.role}</Text></View>
-                  <Text style={styles.chatTime}>{member.time}</Text>
+                  <Text style={styles.chatTime}>{member.messages[member.messages.length - 1]?.createdAt}</Text>
                 </View>
-                <Text style={styles.chatPreview} numberOfLines={1}>{member.preview}</Text>
+                <Text style={styles.chatPreview} numberOfLines={1}>{member.messages[member.messages.length - 1]?.text}</Text>
               </View>
             </TouchableOpacity>
             {index < teamMembers.length - 1 && <View style={styles.divider} />}
@@ -106,6 +106,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 40, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#F1F5F9' },
   title: { fontSize: 28, fontWeight: '800', color: '#0F172A' },
   addButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#F5F3FF', alignItems: 'center', justifyContent: 'center' },
+  addButtonDisabled: { backgroundColor: '#F1F5F9' },
   content: { paddingVertical: 12 },
   sectionTitle: { fontSize: 13, fontWeight: '700', color: '#94A3B8', textTransform: 'uppercase', paddingHorizontal: 20, marginBottom: 8 },
   chatRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 20 },

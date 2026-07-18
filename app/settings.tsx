@@ -2,15 +2,22 @@ import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useWorkspace, type WorkspaceRole } from '../src/context/WorkspaceContext';
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const { user, setRole } = useWorkspace();
 
   const settingsOptions = [
-    { icon: 'account-outline', title: 'Personal Information', subtitle: 'Eden Mea' },
+    { icon: 'account-outline', title: 'Personal Information', subtitle: user.name },
     { icon: 'shield-check-outline', title: 'Security', subtitle: 'Password, 2FA, Biometrics' },
     { icon: 'bell-outline', title: 'Notifications', subtitle: 'Push & Email alerts' },
-    { icon: 'credit-card-outline', title: 'Billing & Plans', subtitle: 'Pro Workspace' },
+    { icon: 'credit-card-outline', title: 'Billing & Plans', subtitle: 'Pro Workspace', adminOnly: true },
+  ].filter((option) => !option.adminOnly || user.role === 'admin');
+
+  const roles: { label: string; value: WorkspaceRole }[] = [
+    { label: 'Workspace Admin', value: 'admin' },
+    { label: 'Team Member', value: 'member' },
   ];
 
   return (
@@ -28,13 +35,32 @@ export default function SettingsScreen() {
         {/* Profile Card */}
         <View style={styles.profileCard}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>OA</Text>
+            <Text style={styles.avatarText}>{user.name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase()}</Text>
           </View>
-          <Text style={styles.profileName}>Eden Mea</Text>
-          <Text style={styles.profileRole}>Workspace Admin</Text>
+          <Text style={styles.profileName}>{user.name}</Text>
+          <Text style={styles.profileRole}>{user.role === 'admin' ? 'Workspace Admin' : 'Team Member'}</Text>
         </View>
 
+        <Text style={styles.sectionLabel}>Demo Access</Text>
+        <View style={styles.roleControl}>
+          {roles.map((role) => {
+            const selected = user.role === role.value;
+            return <TouchableOpacity
+              key={role.value}
+              accessibilityRole="button"
+              accessibilityState={{ selected }}
+              activeOpacity={0.7}
+              onPress={() => setRole(role.value)}
+              style={[styles.roleOption, selected && styles.roleOptionSelected]}
+            >
+              <Text style={[styles.roleOptionText, selected && styles.roleOptionTextSelected]}>{role.label}</Text>
+            </TouchableOpacity>;
+          })}
+        </View>
+        <Text style={styles.roleHelp}>Switch roles to verify financial visibility and approval permissions.</Text>
+
         {/* Settings List */}
+        <Text style={styles.sectionLabel}>Account</Text>
         <View style={styles.settingsGroup}>
           {settingsOptions.map((option, index) => (
             <View key={index}>
@@ -76,6 +102,14 @@ const styles = StyleSheet.create({
   avatarText: { fontSize: 28, fontWeight: '700', color: '#8B5CF6' },
   profileName: { fontSize: 24, fontWeight: '800', color: '#0F172A' },
   profileRole: { fontSize: 15, color: '#64748B', marginTop: 4 },
+
+  sectionLabel: { fontSize: 13, fontWeight: '700', color: '#94A3B8', textTransform: 'uppercase', marginBottom: 12, paddingLeft: 4 },
+  roleControl: { flexDirection: 'row', backgroundColor: '#E2E8F0', borderRadius: 12, padding: 4 },
+  roleOption: { flex: 1, minHeight: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 10, paddingHorizontal: 8 },
+  roleOptionSelected: { backgroundColor: '#FFFFFF' },
+  roleOptionText: { fontSize: 13, fontWeight: '600', color: '#64748B', textAlign: 'center' },
+  roleOptionTextSelected: { color: '#0F172A' },
+  roleHelp: { fontSize: 13, color: '#64748B', lineHeight: 19, marginTop: 8, marginBottom: 24, paddingHorizontal: 4 },
 
   settingsGroup: { backgroundColor: '#FFFFFF', borderRadius: 20, borderWidth: 1, borderColor: '#E2E8F0', overflow: 'hidden' },
   settingRow: { flexDirection: 'row', alignItems: 'center', padding: 16 },
