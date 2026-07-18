@@ -4,6 +4,29 @@ export type WorkspaceRole = 'admin' | 'member';
 export type Permission = 'approveActions' | 'manageData' | 'manageTeam';
 export type ActionDecision = 'approved' | 'rejected' | 'changes_requested';
 export type ActionRisk = 'low' | 'medium' | 'high';
+export type DataSourceStatus = 'connected' | 'syncing' | 'attention';
+
+export interface DataSource {
+  id: string;
+  name: string;
+  type: string;
+  status: DataSourceStatus;
+  lastSync: string;
+  records: string;
+  icon: 'credit-card' | 'finance' | 'aws' | 'google-drive' | 'hubspot' | 'database-outline';
+  color: string;
+  background: string;
+}
+
+export interface WorkspaceDocument {
+  id: string;
+  name: string;
+  type: string;
+  size: string;
+  uploadedAt: string;
+  source: string;
+  status: 'ready' | 'processing';
+}
 
 export interface ChatMessage {
   id: string;
@@ -103,6 +126,24 @@ const initialChatThreads: ChatThread[] = [
   },
 ];
 
+const initialDataSources: DataSource[] = [
+  { id: 'stripe', name: 'Stripe', type: 'Payments', status: 'connected', lastSync: '10 min ago', records: '8,492 records', icon: 'credit-card', color: '#635BFF', background: '#EEECFF' },
+  { id: 'quickbooks', name: 'QuickBooks', type: 'Accounting', status: 'connected', lastSync: '1 hour ago', records: '3,704 records', icon: 'finance', color: '#2CA01C', background: '#EAF5E8' },
+  { id: 'aws-s3', name: 'AWS S3', type: 'Cloud storage', status: 'syncing', lastSync: 'Syncing now', records: '206 files', icon: 'aws', color: '#D97706', background: '#FFF5E5' },
+];
+
+const availableDataSources: DataSource[] = [
+  { id: 'google-drive', name: 'Google Drive', type: 'Documents', status: 'connected', lastSync: 'Not synced yet', records: 'Ready to connect', icon: 'google-drive', color: '#2563EB', background: '#EFF6FF' },
+  { id: 'hubspot', name: 'HubSpot', type: 'CRM', status: 'connected', lastSync: 'Not synced yet', records: 'Ready to connect', icon: 'hubspot', color: '#EA580C', background: '#FFF7ED' },
+  { id: 'postgres', name: 'PostgreSQL', type: 'Database', status: 'connected', lastSync: 'Not synced yet', records: 'Ready to connect', icon: 'database-outline', color: '#0F766E', background: '#F0FDFA' },
+];
+
+const initialDocuments: WorkspaceDocument[] = [
+  { id: 'financial-report', name: 'Q3 Financial Report.pdf', type: 'PDF', size: '2.4 MB', uploadedAt: 'Oct 12', source: 'Google Drive', status: 'ready' },
+  { id: 'employee-handbook', name: 'Employee Handbook 2026.docx', type: 'DOCX', size: '1.1 MB', uploadedAt: 'Oct 10', source: 'Manual upload', status: 'ready' },
+  { id: 'vendor-contracts', name: 'Vendor Contracts Archive.zip', type: 'ZIP', size: '14.8 MB', uploadedAt: 'Oct 5', source: 'AWS S3', status: 'processing' },
+];
+
 const permissions: Record<WorkspaceRole, Permission[]> = {
   admin: ['approveActions', 'manageData', 'manageTeam'],
   member: [],
@@ -113,12 +154,18 @@ interface WorkspaceContextValue {
   actions: ActionItem[];
   activity: ActivityItem[];
   chatThreads: ChatThread[];
+  dataSources: DataSource[];
+  availableDataSources: DataSource[];
+  documents: WorkspaceDocument[];
   can: (permission: Permission) => boolean;
   canAccessThread: (threadId: string) => boolean;
   addTeamMember: (name: string, role: string) => string | null;
+  connectDataSource: (id: string) => boolean;
   decideAction: (id: string, decision: ActionDecision, reason?: string) => void;
+  disconnectDataSource: (id: string) => boolean;
   sendChatMessage: (threadId: string, text: string) => boolean;
   setRole: (role: WorkspaceRole) => void;
+  syncDataSource: (id: string) => boolean;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
@@ -128,6 +175,7 @@ export function WorkspaceProvider({ children }: React.PropsWithChildren) {
   const [actions, setActions] = useState(initialActions);
   const [activity, setActivity] = useState(initialActivity);
   const [chatThreads, setChatThreads] = useState(initialChatThreads);
+  const [dataSources, setDataSources] = useState(initialDataSources);
 
   const can = (permission: Permission) => permissions[user.role].includes(permission);
   const canAccessThread = (threadId: string) => chatThreads.some((thread) => thread.id === threadId && thread.participantIds.includes(user.id));
@@ -172,6 +220,30 @@ export function WorkspaceProvider({ children }: React.PropsWithChildren) {
     return threadId;
   };
 
+  const connectDataSource = (id: string) => {
+    const source = availableDataSources.find((item) => item.id === id);
+    if (!source || !can('manageData') || dataSources.some((item) => item.id === id)) return false;
+
+    setDataSources((current) => [...current, { ...source, status: 'syncing', lastSync: 'Initial sync', records: 'Discovering records' }]);
+    return true;
+  };
+
+  const syncDataSource = (id: string) => {
+    if (!can('manageData') || !dataSources.some((item) => item.id === id)) return false;
+
+    setDataSources((current) => current.map((item) => item.id === id
+      ? { ...item, status: 'syncing', lastSync: 'Syncing now' }
+      : item));
+    return true;
+  };
+
+  const disconnectDataSource = (id: string) => {
+    if (!can('manageData') || !dataSources.some((item) => item.id === id)) return false;
+
+    setDataSources((current) => current.filter((item) => item.id !== id));
+    return true;
+  };
+
   const sendChatMessage = (threadId: string, text: string) => {
     const message = text.trim();
     if (!message || !canAccessThread(threadId)) return false;
@@ -201,7 +273,7 @@ export function WorkspaceProvider({ children }: React.PropsWithChildren) {
   };
 
   return (
-    <WorkspaceContext.Provider value={{ user, actions, activity, chatThreads, can, canAccessThread, addTeamMember, decideAction, sendChatMessage, setRole }}>
+    <WorkspaceContext.Provider value={{ user, actions, activity, chatThreads, dataSources, availableDataSources, documents: initialDocuments, can, canAccessThread, addTeamMember, connectDataSource, decideAction, disconnectDataSource, sendChatMessage, setRole, syncDataSource }}>
       {children}
     </WorkspaceContext.Provider>
   );
