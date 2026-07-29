@@ -112,7 +112,27 @@ export interface VentureCohortPost {
   authorName: string;
   body: string;
   createdAt: string;
-  commentCount: number;
+  comments: VentureCohortComment[];
+  isReported: boolean;
+}
+
+export interface VentureCohortComment {
+  id: string;
+  postId: string;
+  authorName: string;
+  body: string;
+  createdAt: string;
+  isReported: boolean;
+}
+
+export interface VentureCommunityPostInput {
+  authorName: string;
+  body: string;
+}
+
+export interface VentureCommunityCommentInput {
+  authorName: string;
+  body: string;
 }
 
 export interface VentureEntitlement {

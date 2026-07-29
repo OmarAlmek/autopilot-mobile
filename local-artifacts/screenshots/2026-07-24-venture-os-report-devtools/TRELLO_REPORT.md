@@ -11,7 +11,7 @@ Venture OS mobile integration: Playbook lifecycle and functional Toolbox
 
 ## Summary
 
-Venture OS now operates as a distinct product domain inside the existing AutoPilot Expo Router shell. The implemented web workflow includes deterministic domain switching, a repository-backed curriculum, Company Context onboarding, authored Module 1 lessons, explicit draft-lesson gating, a persistent ten-artifact Playbook, and a functional 55-tool directory.
+Venture OS now operates as a distinct product domain inside the existing AutoPilot Expo Router shell. The implemented web workflow includes deterministic domain switching, a repository-backed curriculum, Company Context onboarding, authored Module 1 lessons, explicit draft-lesson gating, a persistent ten-artifact Playbook, a functional 55-tool directory, and a local founder Community workflow.
 
 The attached screenshots were captured directly from installed Google Chrome through the Chrome DevTools Protocol using a Pixel 8 class mobile profile. They show functional application routes rather than presentation boards or resized desktop-browser captures.
 
@@ -29,6 +29,7 @@ The attached screenshots were captured directly from installed Google Chrome thr
 - Kept learner-authored artifact content separate from explicitly attributed AI guidance.
 - Added 55 typed Toolbox records across Coding, Agents, RAG, Voice, Media, Compliance, and Research.
 - Added Toolbox search, All/Saved/category filters, details, external website actions, and persistent saved tools.
+- Added a typed Community feed with post and comment creation, stable detail routes, persisted report state, and explicit local moderation limits.
 - Added loading, error, empty, and recovery states across the implemented workflows where applicable.
 
 ## Acceptance Checklist
@@ -48,6 +49,10 @@ The attached screenshots were captured directly from installed Google Chrome thr
 - [x] Toolbox details open independently from save controls, with no nested interactive elements.
 - [x] Saved tools survive a full-page reload and appear in the Saved view.
 - [x] Toolbox returns deterministically to the AutoPilot dashboard.
+- [x] Community creates one post and comment without duplicate submission and persists both across reload.
+- [x] Community post details support cold deep links and deterministic return to the feed.
+- [x] Post and comment report controls have accessible labels and persist local reported state.
+- [x] Venture OS retains exactly five visible tabs when a Community detail route is open.
 - [x] All evidence routes render at a 390 x 844 CSS mobile viewport without horizontal overflow.
 - [x] All seven evidence images are unique 1170 x 2532 PNG files.
 - [ ] Validate Android and iOS rendering on physical devices.
@@ -88,6 +93,7 @@ The attached screenshots were captured directly from installed Google Chrome thr
 - Evidence check: seven unique image hashes and no horizontal overflow.
 - Toolbox live check (2026-07-29): Chrome at 390 x 844 CSS pixels, 55 tools, seven categories, query/category filtering, zero-result recovery, details, save persistence after reload, and return to `/dashboard`.
 - DOM check: zero nested buttons and no Toolbox hydration errors after separating details and save controls.
+- Community live check (2026-07-29): post creation, comment creation, deep-link reload, local report persistence, deterministic back navigation, five-tab shell, and no horizontal overflow at 390 x 844.
 - TypeScript and touched-file diagnostics pass for the implemented product work.
 
 ## Known Limits
@@ -96,8 +102,9 @@ The attached screenshots were captured directly from installed Google Chrome thr
 - Company Context is shown in its authentic first-run state because the capture profile had no saved company profile.
 - Backend integration remains deferred; current workflows use typed interfaces and a local persistence adapter.
 - Authentication and authorization shown in the local shell are not production security boundaries.
-- Community remains a static placeholder and is not included in this acceptance claim.
 - Toolbox website launching and storage failure recovery still require physical-device exercise.
+- Community reporting is local prototype state, not server-side moderation or a security control.
+- Community storage-failure UI and rollback are implemented but still require an injected browser or native failure exercise.
 - Automated navigation, persistence, and permission regression tests remain open.
 
 ## Next Actions
@@ -106,7 +113,7 @@ The attached screenshots were captured directly from installed Google Chrome thr
 2. Verify native keyboard avoidance, hardware Back, safe areas, offline recovery, and enlarged text.
 3. Add automated tests for domain switching, curriculum persistence, draft gating, Playbook persistence, and Toolbox filtering/saved state.
 4. Resolve the credential-removal and production authentication items in the ranked execution plan before release.
-5. Implement the Community local vertical slice with moderation/reporting contracts.
+5. Exercise injected storage failures for Toolbox and Community without duplicate mutations.
 6. Connect typed repository contracts to approved backend adapters when backend access is available.
 
 ## Evidence Package

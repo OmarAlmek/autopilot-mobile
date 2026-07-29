@@ -6,7 +6,7 @@ import {
   type VentureOSRepository,
   type VentureRepositoryError,
 } from '../services/ventureOS/VentureOSRepository';
-import type { VentureArtifact, VentureCompanyContext, VentureModule, VentureReflection, VentureTool, VentureTrack } from '../types/ventureOS';
+import type { VentureArtifact, VentureCohortPost, VentureCommunityCommentInput, VentureCommunityPostInput, VentureCompanyContext, VentureModule, VentureReflection, VentureTool, VentureTrack } from '../types/ventureOS';
 
 export type VentureResource<T> =
   | { status: 'loading' }
@@ -19,6 +19,7 @@ interface VentureOSContextValue {
   curriculum: VentureResource<VentureModule[]>;
   artifacts: VentureResource<VentureArtifact[]>;
   tools: VentureResource<VentureTool[]>;
+  cohortPosts: VentureResource<VentureCohortPost[]>;
   completedLessons: string[];
   reflections: VentureReflection[];
   selectedTrack: VentureTrack;
@@ -26,10 +27,14 @@ interface VentureOSContextValue {
   reloadCompanyContext: () => void;
   reloadArtifacts: () => void;
   reloadTools: () => void;
+  reloadCohortPosts: () => void;
   setCompanyContext: (value: VentureCompanyContext) => Promise<void>;
   saveArtifact: (artifactId: string, content: string, status: VentureArtifact['status']) => Promise<void>;
   appendArtifactGuidance: (artifactId: string, guidance: string) => Promise<void>;
   setToolSaved: (toolId: string, isSaved: boolean) => Promise<void>;
+  createCohortPost: (value: VentureCommunityPostInput) => Promise<VentureCohortPost>;
+  addCohortComment: (postId: string, value: VentureCommunityCommentInput) => Promise<void>;
+  reportCohortContent: (contentId: string, contentType: 'post' | 'comment') => Promise<void>;
   saveReflection: (value: VentureReflection) => Promise<void>;
   setSelectedTrack: (track: VentureTrack) => Promise<void>;
   toggleLessonComplete: (lessonId: string) => Promise<void>;
@@ -60,6 +65,7 @@ export function VentureOSProvider({ children, repository = localVentureOSReposit
   const [curriculum, setCurriculum] = useState<VentureResource<VentureModule[]>>({ status: 'loading' });
   const [artifacts, setArtifacts] = useState<VentureResource<VentureArtifact[]>>({ status: 'loading' });
   const [tools, setTools] = useState<VentureResource<VentureTool[]>>({ status: 'loading' });
+  const [cohortPosts, setCohortPosts] = useState<VentureResource<VentureCohortPost[]>>({ status: 'loading' });
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const [reflections, setReflections] = useState<VentureReflection[]>([]);
   const [selectedTrack, setSelectedTrackState] = useState<VentureTrack>('tradeflow');
@@ -95,11 +101,19 @@ export function VentureOSProvider({ children, repository = localVentureOSReposit
       .catch((error: unknown) => setTools({ status: 'error', error: toVentureRepositoryError(error) }));
   };
 
+  const reloadCohortPosts = () => {
+    setCohortPosts({ status: 'loading' });
+    repository.listCohortPosts()
+      .then((data) => setCohortPosts({ status: 'ready', data }))
+      .catch((error: unknown) => setCohortPosts({ status: 'error', error: toVentureRepositoryError(error) }));
+  };
+
   useEffect(() => {
     reloadCurriculum();
     reloadCompanyContext();
     reloadArtifacts();
     reloadTools();
+    reloadCohortPosts();
     repository.getProgress().then((progress) => {
       setCompletedLessons(progress.completedLessonIds);
       setSelectedTrackState(progress.selectedTrack);
@@ -149,6 +163,26 @@ export function VentureOSProvider({ children, repository = localVentureOSReposit
       : current);
   };
 
+  const updateCohortPostResource = (saved: VentureCohortPost) => {
+    setCohortPosts((current) => current.status === 'ready'
+      ? { status: 'ready', data: [saved, ...current.data.filter((post) => post.id !== saved.id)] }
+      : current);
+  };
+
+  const createCohortPost = async (value: VentureCommunityPostInput) => {
+    const saved = await repository.createCohortPost(value);
+    updateCohortPostResource(saved);
+    return saved;
+  };
+
+  const addCohortComment = async (postId: string, value: VentureCommunityCommentInput) => {
+    updateCohortPostResource(await repository.addCohortComment(postId, value));
+  };
+
+  const reportCohortContent = async (contentId: string, contentType: 'post' | 'comment') => {
+    updateCohortPostResource(await repository.reportCohortContent(contentId, contentType));
+  };
+
   const toggleLessonComplete = async (lessonId: string) => {
     const nextCompletedLessons = completedLessons.includes(lessonId)
       ? completedLessons.filter((id) => id !== lessonId)
@@ -167,6 +201,7 @@ export function VentureOSProvider({ children, repository = localVentureOSReposit
       curriculum,
       artifacts,
       tools,
+      cohortPosts,
       completedLessons,
       reflections,
       selectedTrack,
@@ -174,10 +209,14 @@ export function VentureOSProvider({ children, repository = localVentureOSReposit
       reloadCompanyContext,
       reloadArtifacts,
       reloadTools,
+      reloadCohortPosts,
       setCompanyContext,
       saveArtifact,
       appendArtifactGuidance,
       setToolSaved,
+      createCohortPost,
+      addCohortComment,
+      reportCohortContent,
       saveReflection,
       setSelectedTrack,
       toggleLessonComplete,

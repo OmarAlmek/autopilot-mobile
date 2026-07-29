@@ -1,6 +1,8 @@
 import type {
   VentureArtifact,
   VentureCohortPost,
+  VentureCommunityCommentInput,
+  VentureCommunityPostInput,
   VentureCompanyContext,
   VentureEntitlement,
   VentureModule,
@@ -36,6 +38,9 @@ export interface VentureOSRepository {
   listTools(): Promise<VentureTool[]>;
   setToolSaved(toolId: string, isSaved: boolean): Promise<VentureTool>;
   listCohortPosts(): Promise<VentureCohortPost[]>;
+  createCohortPost(value: VentureCommunityPostInput): Promise<VentureCohortPost>;
+  addCohortComment(postId: string, value: VentureCommunityCommentInput): Promise<VentureCohortPost>;
+  reportCohortContent(contentId: string, contentType: 'post' | 'comment'): Promise<VentureCohortPost>;
   getEntitlement(): Promise<VentureEntitlement>;
 }
 

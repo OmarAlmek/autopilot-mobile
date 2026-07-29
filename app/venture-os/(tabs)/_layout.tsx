@@ -24,6 +24,7 @@ export default function VentureTabsLayout() {
       <Tabs.Screen name="playbook" options={{ title: 'Playbook', tabBarIcon: ({ color }) => <MaterialCommunityIcons name="notebook-edit-outline" size={22} color={color} /> }} />
       <Tabs.Screen name="toolbox" options={{ title: 'Toolbox', tabBarIcon: ({ color }) => <MaterialCommunityIcons name="tools" size={22} color={color} /> }} />
       <Tabs.Screen name="community" options={{ title: 'Community', tabBarIcon: ({ color }) => <MaterialCommunityIcons name="account-group-outline" size={22} color={color} /> }} />
+      <Tabs.Screen name="community/[postId]" options={{ href: null }} />
     </Tabs>
   );
 }

@@ -255,9 +255,15 @@ Execute these as three separate delegated tasks after P1-02, not one broad task.
 
 ### Community slice
 
+**Status:** Implemented and web-verified for feed, detail, mutations, reporting, persistence, and navigation. Injected storage-failure and physical-device validation remain pending.
+
 - Build feed, post detail, composer, comment, and explicit empty/loading/error states against a local repository.
 - Keep moderation/reporting affordances in the contract even if backend execution is deferred.
 - Success: create a local post/comment, deep-link to detail, recover from failure without duplicate submission, and verify accessible author/action labels.
+
+**Implementation evidence (2026-07-29):** Community now uses typed posts, comments, mutation inputs, and local report state behind the existing repository boundary. Optional version-1 persisted fields preserve compatibility with older local state. The feed provides a retained-on-failure composer, empty/loading/error states, stable discussion links, separate accessible Open and Report controls, and explicit local-moderation disclosure. Detail routes support comments, comment reporting, unknown-ID recovery, and deterministic return to the feed after a cold deep link. Repository writes validate trimmed input and roll back maps when persistence fails.
+
+**Verified:** `npx tsc --noEmit`; touched-file diagnostics; Chrome at 390 x 844 CSS pixels; disabled empty composers; one post creation; stable post deep link; one comment creation; persisted report state; full-page deep-link reload preserving post, comment, and report state; deterministic back to `/venture-os/community`; exactly five visible tabs; no horizontal overflow; and no nested interactive controls. Failure-state UI is implemented, but an injected storage-write failure was not exercised in the browser. Native validation was not performed.
 
 ---
 

@@ -3,6 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type {
   VentureArtifact,
   VentureCohortPost,
+  VentureCommunityCommentInput,
+  VentureCommunityPostInput,
   VentureCompanyContext,
   VentureEntitlement,
   VentureModule,
@@ -26,9 +28,26 @@ interface StoredVentureState {
   reflections?: VentureReflection[];
   artifacts?: VentureArtifact[];
   tools?: VentureTool[];
+  cohortPosts?: VentureCohortPost[];
 }
 
 const STORAGE_KEY = '@autopilot/venture-os/v1';
+
+const cohortPostSeeds: VentureCohortPost[] = [{
+  id: 'welcome-to-the-cohort',
+  authorName: 'Maya Chen',
+  body: 'What is the one workflow you want to make meaningfully better during this program?',
+  createdAt: '2026-07-21T09:00:00.000Z',
+  comments: [{
+    id: 'welcome-comment-1',
+    postId: 'welcome-to-the-cohort',
+    authorName: 'Jon Bell',
+    body: 'Customer onboarding. We lose too much context between the sale and the first successful outcome.',
+    createdAt: '2026-07-21T10:15:00.000Z',
+    isReported: false,
+  }],
+  isReported: false,
+}];
 
 const artifactSeeds: VentureArtifact[] = [
   ['ai-economics-map', 'AI-Native Economics Map', 'Define the workflow unit, customer value, and economic change your company will prove.'],
@@ -305,6 +324,7 @@ export class LocalVentureOSRepository implements VentureOSRepository {
   private readonly reflections = new Map<string, VentureReflection>();
   private readonly artifacts = new Map<string, VentureArtifact>(artifactSeeds.map((artifact) => [artifact.id, artifact]));
   private readonly tools = new Map<string, VentureTool>(toolSeeds.map((tool) => [tool.id, tool]));
+  private readonly cohortPosts = new Map<string, VentureCohortPost>(cohortPostSeeds.map((post) => [post.id, post]));
   private hydration: Promise<void> | null = null;
 
   constructor(
@@ -341,6 +361,7 @@ export class LocalVentureOSRepository implements VentureOSRepository {
         stored.tools?.forEach((tool) => {
           if (this.tools.has(tool.id)) this.tools.set(tool.id, tool);
         });
+        stored.cohortPosts?.forEach((post) => this.cohortPosts.set(post.id, post));
       }).catch(() => {
         this.hydration = null;
         throw new VentureRepositoryError(
@@ -362,6 +383,7 @@ export class LocalVentureOSRepository implements VentureOSRepository {
         reflections: [...this.reflections.values()],
         artifacts: [...this.artifacts.values()],
         tools: [...this.tools.values()],
+        cohortPosts: [...this.cohortPosts.values()],
       };
       await this.storage.setItem(STORAGE_KEY, JSON.stringify(value));
     } catch {
@@ -519,8 +541,85 @@ export class LocalVentureOSRepository implements VentureOSRepository {
   }
 
   async listCohortPosts(): Promise<VentureCohortPost[]> {
-    this.ensureAvailable();
-    return [];
+    await this.hydrate();
+    return this.mode === 'empty' ? [] : [...this.cohortPosts.values()]
+      .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+  }
+
+  async createCohortPost(value: VentureCommunityPostInput): Promise<VentureCohortPost> {
+    await this.hydrate();
+    const authorName = value.authorName.trim();
+    const body = value.body.trim();
+    if (!authorName || !body) {
+      throw new VentureRepositoryError('validation', 'Add your name and an update before publishing.', false);
+    }
+    const createdAt = new Date().toISOString();
+    const post: VentureCohortPost = {
+      id: `post-${createdAt}-${this.cohortPosts.size + 1}`,
+      authorName,
+      body,
+      createdAt,
+      comments: [],
+      isReported: false,
+    };
+    this.cohortPosts.set(post.id, post);
+    try {
+      await this.persist();
+    } catch (error) {
+      this.cohortPosts.delete(post.id);
+      throw error;
+    }
+    return post;
+  }
+
+  async addCohortComment(postId: string, value: VentureCommunityCommentInput): Promise<VentureCohortPost> {
+    await this.hydrate();
+    const post = this.cohortPosts.get(postId);
+    if (!post) throw new VentureRepositoryError('not-found', 'That discussion was not found.', false);
+    const authorName = value.authorName.trim();
+    const body = value.body.trim();
+    if (!authorName || !body) {
+      throw new VentureRepositoryError('validation', 'Add your name and a comment before publishing.', false);
+    }
+    const createdAt = new Date().toISOString();
+    const updated: VentureCohortPost = {
+      ...post,
+      comments: [...post.comments, {
+        id: `comment-${createdAt}-${post.comments.length + 1}`,
+        postId,
+        authorName,
+        body,
+        createdAt,
+        isReported: false,
+      }],
+    };
+    this.cohortPosts.set(postId, updated);
+    try {
+      await this.persist();
+    } catch (error) {
+      this.cohortPosts.set(postId, post);
+      throw error;
+    }
+    return updated;
+  }
+
+  async reportCohortContent(contentId: string, contentType: 'post' | 'comment'): Promise<VentureCohortPost> {
+    await this.hydrate();
+    const post = contentType === 'post'
+      ? this.cohortPosts.get(contentId)
+      : [...this.cohortPosts.values()].find((item) => item.comments.some((comment) => comment.id === contentId));
+    if (!post) throw new VentureRepositoryError('not-found', 'That community content was not found.', false);
+    const updated: VentureCohortPost = contentType === 'post'
+      ? { ...post, isReported: true }
+      : { ...post, comments: post.comments.map((comment) => comment.id === contentId ? { ...comment, isReported: true } : comment) };
+    this.cohortPosts.set(post.id, updated);
+    try {
+      await this.persist();
+    } catch (error) {
+      this.cohortPosts.set(post.id, post);
+      throw error;
+    }
+    return updated;
   }
 
   async getEntitlement(): Promise<VentureEntitlement> {
