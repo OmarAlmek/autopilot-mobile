@@ -140,6 +140,21 @@ export default function DashboardScreen() {
           </TouchableOpacity>
         </View>
 
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Programs</Text>
+          <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={() => router.push('/venture-os')}>
+            <Card style={styles.ventureCard}>
+              <View style={styles.ventureIcon}><MaterialCommunityIcons name="creation" size={24} color={colors.inverse} /></View>
+              <View style={styles.briefCopy}>
+                <Text style={styles.ventureEyebrow}>VENTURE OS</Text>
+                <Text style={styles.ventureTitle}>Build your AI-native company</Text>
+                <Text style={styles.briefText}>A 12-week curriculum, playbook, toolbox, and founder community.</Text>
+              </View>
+              <MaterialCommunityIcons name="arrow-right" size={22} color={colors.textPrimary} />
+            </Card>
+          </TouchableOpacity>
+        </View>
+
         {canViewFinancials ? <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Weekly Cashflow</Text>
@@ -231,6 +246,10 @@ const styles = StyleSheet.create({
   briefCopy: { flex: 1, paddingRight: spacing[3] },
   briefTitle: { ...typography.itemTitle, color: colors.textPrimary },
   briefText: { ...typography.supporting, color: colors.textSecondary, lineHeight: 20, marginTop: spacing[1] },
+  ventureCard: { alignItems: 'center', borderColor: colors.textPrimary, flexDirection: 'row' },
+  ventureIcon: { alignItems: 'center', backgroundColor: colors.textPrimary, borderRadius: radii.control, height: 48, justifyContent: 'center', marginRight: spacing[3], width: 48 },
+  ventureEyebrow: { ...typography.micro, color: colors.accent, fontWeight: '800' },
+  ventureTitle: { ...typography.itemTitle, color: colors.textPrimary, marginTop: spacing[1] },
 
   // Chart Card
   chartCard: { borderRadius: radii.feature, padding: spacing[6] },
