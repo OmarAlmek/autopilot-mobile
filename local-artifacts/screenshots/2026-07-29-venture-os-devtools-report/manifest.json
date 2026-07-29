@@ -1,0 +1,29 @@
+{
+  "capturedAt": "2026-07-29",
+  "browser": "Google Chrome 150.0.7871.187",
+  "protocol": "Chrome DevTools Protocol 1.3",
+  "profile": {
+    "name": "Pixel 8 class",
+    "viewportCssPixels": "390x844",
+    "deviceScaleFactor": 3,
+    "touchPoints": 5,
+    "pointer": "coarse"
+  },
+  "baseUrl": "http://localhost:8083",
+  "screenshots": [
+    { "file": "01-autopilot-entry.png", "domain": "AutoPilot", "route": "/dashboard", "title": "Operational overview", "pixels": "1170x2532", "sha256": "88f5e346bfdc0fab5de11d0afdc308ad14a39eabb1e9d7d1e460d3122b8d53cf" },
+    { "file": "autopilot-02-actions.png", "domain": "AutoPilot", "route": "/actions", "title": "Approval queue", "pixels": "1170x2532", "sha256": "c22d2b4866421e02820a130d5a4ed9977acb744dfa8e37cdcbb345f53d168656" },
+    { "file": "autopilot-03-action-review.png", "domain": "AutoPilot", "route": "/action/1", "title": "Human review", "pixels": "1170x2532", "sha256": "00bd7d4be358b5468eea9382ad5c63e96bdc79cb886a5196cd681fe61216fea8" },
+    { "file": "autopilot-04-activity.png", "domain": "AutoPilot", "route": "/transactions", "title": "Audit activity", "pixels": "1170x2532", "sha256": "aff87d7048df31fdaa4109d2f25454eed23c702e1d3e7ef6579d8e8fb9e9ff80" },
+    { "file": "autopilot-05-messages.png", "domain": "AutoPilot", "route": "/chat", "title": "Agents and team", "pixels": "1170x2532", "sha256": "5c8e769d388a465e0254995abd918720b6020b0d1cbe04b4474a90fbb9574ed8" },
+    { "file": "autopilot-06-agent-chat.png", "domain": "AutoPilot", "route": "/message?threadId=sarah-finance", "title": "Agent conversation", "pixels": "1170x2532", "sha256": "523d4adfb8b058ae3d2f9102cdf4da45b8871fc3a0b43239b876dcf297f0f951" },
+    { "file": "autopilot-07-data.png", "domain": "AutoPilot", "route": "/data", "title": "Data and context", "pixels": "1170x2532", "sha256": "a65a2f64219616764c08be40a36414f3298b5709b0e183932b63188b3a8e1d80" },
+    { "file": "02-curriculum.png", "domain": "Venture OS", "route": "/venture-os/curriculum", "title": "Curriculum", "pixels": "1170x2532", "sha256": "ffbde24a73ec7e47c8177bde300de9a87889f3756c1c1eaf8b7efaafc7dddefa" },
+    { "file": "03-company-context.png", "domain": "Venture OS", "route": "/venture-os/context", "title": "Company Context", "pixels": "1170x2532", "sha256": "3129f339e1f640dc677c0f9893a8dbc3c0734ada7890efb7be8369ff5bea4183" },
+    { "file": "04-playbook.png", "domain": "Venture OS", "route": "/venture-os/playbook", "title": "Playbook", "pixels": "1170x2532", "sha256": "3c68635b43b6f22f6fe9ba4165dcd26288a36d54afca0d31c71e7ad6bf374ee5" },
+    { "file": "05-artifact-workspace.png", "domain": "Venture OS", "route": "/venture-os/playbook/ai-economics-map", "title": "Artifact workspace", "pixels": "1170x2532", "sha256": "3ae3b1b2d6e0c002c9fe9d624c9a6fa1319823a02b36fc54195e84ee5d8c4a37" },
+    { "file": "06-toolbox.png", "domain": "Venture OS", "route": "/venture-os/toolbox", "title": "Toolbox", "pixels": "1170x2532", "sha256": "efa5c31154537de6099d84c5068994d43cf4ba4f6529e2faeeabd249797c0cd8" },
+    { "file": "07-community-feed.png", "domain": "Venture OS", "route": "/venture-os/community", "title": "Community feed", "pixels": "1170x2532", "sha256": "6cc935b914753328c0d11b6b154c7249eb749b4440b74ad47a984df1f082670a" },
+    { "file": "08-community-discussion.png", "domain": "Venture OS", "route": "/venture-os/community/welcome-to-the-cohort", "title": "Community discussion", "pixels": "1170x2532", "sha256": "5d1b0fc15fcde46f6577b1b43d9bf42126ad9714e5dec59f19acde281408e179" }
+  ]
+}

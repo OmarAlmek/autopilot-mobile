@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AutoPilot + Venture OS Product Report - July 29, 2026</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17201d;
+      --muted: #65716c;
+      --line: #dce3df;
+      --paper: #ffffff;
+      --wash: #f4f7f5;
+      --green: #147d64;
+      --green-soft: #e4f3ed;
+      --blue: #2066a8;
+      --amber: #bb6b21;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(90deg, transparent 31px, rgba(23, 32, 29, 0.035) 32px, transparent 33px),
+        var(--wash);
+      color: var(--ink);
+      font-family: "Aptos", "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    a { color: inherit; }
+
+    .shell {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    header {
+      padding: 64px 0 40px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .kicker {
+      margin: 0 0 14px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(42px, 7vw, 78px);
+      font-weight: 500;
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .lede {
+      max-width: 720px;
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: 19px;
+      line-height: 1.55;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      margin-top: 42px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: var(--line);
+    }
+
+    .fact {
+      min-height: 116px;
+      padding: 20px;
+      background: var(--paper);
+    }
+
+    .fact strong {
+      display: block;
+      margin-bottom: 8px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 27px;
+      font-weight: 500;
+    }
+
+    .fact span {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    main { padding: 56px 0 80px; }
+
+    .domain-section + .domain-section {
+      margin-top: 64px;
+      padding-top: 54px;
+      border-top: 1px solid var(--line);
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    h2 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 35px;
+      font-weight: 500;
+      letter-spacing: 0;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    figure {
+      margin: 0;
+      min-width: 0;
+    }
+
+    .shot {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #ccd6d1;
+      border-radius: 8px;
+      background: #e8eeeb;
+      box-shadow: 0 14px 34px rgba(25, 42, 35, 0.09);
+    }
+
+    .shot::before {
+      content: "";
+      display: block;
+      padding-top: 216.41%;
+    }
+
+    .shot img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    figcaption { padding: 14px 2px 22px; }
+
+    .number {
+      display: inline-flex;
+      width: 28px;
+      height: 28px;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      border-radius: 50%;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    h3 {
+      margin: 0 0 7px;
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+
+    figcaption p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .route {
+      display: block;
+      margin-top: 9px;
+      overflow: hidden;
+      color: var(--blue);
+      font: 12px/1.4 Consolas, monospace;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .notes {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 28px;
+      margin-top: 48px;
+      padding-top: 38px;
+      border-top: 1px solid var(--line);
+    }
+
+    .checklist {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 22px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .checklist li {
+      position: relative;
+      padding: 14px 14px 14px 42px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .checklist li::before {
+      content: "OK";
+      position: absolute;
+      left: 12px;
+      top: 14px;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .limit {
+      padding: 24px;
+      border-left: 4px solid var(--amber);
+      background: #fff9f1;
+    }
+
+    .limit h3 { margin-bottom: 12px; }
+
+    .limit p {
+      margin: 0;
+      color: #70553d;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    footer {
+      padding: 24px 0 40px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    footer .shell {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    @media (max-width: 940px) {
+      .facts, .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 640px) {
+      .shell { width: min(100% - 24px, 1180px); }
+      header { padding-top: 40px; }
+      .facts, .gallery, .section-head, .notes, .checklist { grid-template-columns: 1fr; }
+      .gallery { gap: 12px; }
+      .shot { max-width: 390px; }
+      footer .shell { display: block; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .shell { width: 100%; }
+      header { padding-top: 24px; }
+      .gallery { grid-template-columns: repeat(4, 1fr); }
+      .shot { box-shadow: none; }
+      figure { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="shell">
+      <p class="kicker">Complete product evidence / July 29, 2026</p>
+      <h1>AutoPilot + Venture OS</h1>
+      <p class="lede">A simple visual record of the complete mobile product: AutoPilot operations and the Venture OS founder journey. Every image was captured from a live route through Google Chrome DevTools using one consistent mobile profile.</p>
+      <div class="facts" aria-label="Capture facts">
+        <div class="fact"><strong>14</strong><span>Live product screens</span></div>
+        <div class="fact"><strong>390 x 844</strong><span>CSS pixel viewport</span></div>
+        <div class="fact"><strong>3x</strong><span>Device scale factor</span></div>
+        <div class="fact"><strong>Chrome 150</strong><span>CDP 1.3 capture</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="domain-section" aria-labelledby="autopilot-title">
+      <div class="section-head">
+        <h2 id="autopilot-title">AutoPilot operations</h2>
+        <p>The operating layer brings financial visibility, approvals, human decisions, audit history, workspace agents, team conversations, and connected data into one five-tab shell.</p>
+      </div>
+      <div class="gallery" aria-label="AutoPilot screenshots">
+      <figure>
+        <div class="shot"><img src="01-autopilot-entry.png" alt="AutoPilot dashboard showing the Venture OS program entry" loading="lazy"></div>
+        <figcaption><span class="number">01</span><h3>Operational overview</h3><p>Cash, burn, pending actions, briefings, activity, and the Venture OS entry share one dashboard.</p><span class="route">/dashboard</span></figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="autopilot-02-actions.png" alt="AutoPilot pending actions with risk and approval information" loading="lazy"></div>
+        <figcaption><span class="number">02</span><h3>Approval queue</h3><p>Financial and access requests surface risk, due dates, requesters, and review actions.</p><span class="route">/actions</span></figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="autopilot-03-action-review.png" alt="AutoPilot request detail with AI recommendation and human decision controls" loading="lazy"></div>
+        <figcaption><span class="number">03</span><h3>Human review</h3><p>Evidence and AI guidance support the decision while an authorized person remains in control.</p><span class="route">/action/1</span></figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="autopilot-04-activity.png" alt="AutoPilot workspace audit trail" loading="lazy"></div>
+        <figcaption><span class="number">04</span><h3>Audit activity</h3><p>Visible money movements and decisions are organized into a role-aware workspace trail.</p><span class="route">/transactions</span></figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="autopilot-05-messages.png" alt="AutoPilot message hub with workspace agents and company team" loading="lazy"></div>
+        <figcaption><span class="number">05</span><h3>Agents and team</h3><p>Searchable conversations keep workspace agents and human teammates in one place.</p><span class="route">/chat</span></figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="autopilot-06-agent-chat.png" alt="AutoPilot Finance AI conversation using workspace data" loading="lazy"></div>
+        <figcaption><span class="number">06</span><h3>Agent conversation</h3><p>Thread access, workspace context disclosure, message history, and composition form a usable chat.</p><span class="route">/message?threadId=sarah-finance</span></figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="autopilot-07-data.png" alt="AutoPilot data and context source management" loading="lazy"></div>
+        <figcaption><span class="number">07</span><h3>Data and context</h3><p>Admins can inspect source health, search knowledge, connect systems, and manage synchronization.</p><span class="route">/data</span></figcaption>
+      </figure>
+      </div>
+    </section>
+
+    <section class="domain-section" aria-labelledby="venture-title">
+      <div class="section-head">
+        <h2 id="venture-title">Venture OS journey</h2>
+        <p>The founder layer turns company context and authored learning into persistent decisions, practical tools, and cohort discussion while preserving deterministic return to AutoPilot.</p>
+      </div>
+      <div class="gallery" aria-label="Venture OS screenshots">
+      <figure>
+        <div class="shot"><img src="02-curriculum.png" alt="Venture OS curriculum with tracks and learning progress" loading="lazy"></div>
+        <figcaption><span class="number">08</span><h3>Curriculum</h3><p>Track selection, progress, published lessons, and release states live in one scan-friendly view.</p><span class="route">/venture-os/curriculum</span></figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="03-company-context.png" alt="Company Context first-run onboarding form" loading="lazy"></div>
+        <figcaption><span class="number">09</span><h3>Company Context</h3><p>A three-step native workflow gathers the company facts used to personalize the journey.</p><span class="route">/venture-os/context</span></figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="04-playbook.png" alt="Venture OS company playbook artifact list" loading="lazy"></div>
+        <figcaption><span class="number">10</span><h3>Company Playbook</h3><p>Ten operating artifacts make progress, drafts, and completed decisions visible.</p><span class="route">/venture-os/playbook</span></figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="05-artifact-workspace.png" alt="AI-Native Economics Map working draft editor" loading="lazy"></div>
+        <figcaption><span class="number">11</span><h3>Artifact workspace</h3><p>Founder-authored work is saved separately from clearly attributed AI guidance.</p><span class="route">/venture-os/playbook/ai-economics-map</span></figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="06-toolbox.png" alt="AI startup toolbox with search and category filters" loading="lazy"></div>
+        <figcaption><span class="number">12</span><h3>Toolbox</h3><p>A searchable directory covers 55 tools across seven practical workflow categories.</p><span class="route">/venture-os/toolbox</span></figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="07-community-feed.png" alt="Founder Community feed and post composer" loading="lazy"></div>
+        <figcaption><span class="number">13</span><h3>Community feed</h3><p>Founders can post updates, open discussions, and report content through accessible controls.</p><span class="route">/venture-os/community</span></figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="08-community-discussion.png" alt="Community discussion with a persisted comment" loading="lazy"></div>
+        <figcaption><span class="number">14</span><h3>Discussion detail</h3><p>Stable deep links support persisted comments, reporting, and deterministic return navigation.</p><span class="route">/venture-os/community/welcome-to-the-cohort</span></figcaption>
+      </figure>
+      </div>
+    </section>
+
+    <section class="notes" aria-label="Validation summary">
+      <div>
+        <h2>What this proves</h2>
+        <ul class="checklist">
+          <li>AutoPilot and Venture OS share one Expo Router shell.</li>
+          <li>All 14 captured routes rendered without horizontal overflow.</li>
+          <li>Both domains retain visible, deterministic five-tab navigation.</li>
+          <li>Approvals preserve explicit human decision authority.</li>
+          <li>Workspace agents disclose their use of current business data.</li>
+          <li>Learning, artifacts, tools, and Community have persisted workflows.</li>
+        </ul>
+      </div>
+      <aside class="limit">
+        <h3>Evidence boundary</h3>
+        <p>This report verifies the Expo web build in Google Chrome with mobile metrics and touch emulation. It does not claim physical-device rendering, hardware Back behavior, production authentication or authorization, backend moderation, or production data connections.</p>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell"><span>AutoPilot + Venture OS complete product report</span><span>Capture metadata and SHA-256 hashes: manifest.json</span></div>
+  </footer>
+</body>
+</html>
